@@ -46,7 +46,7 @@ public class Pessoa {
     private EstadoCivilEnum estadoCivil;
 
     @NotNull
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "ID_ENDERECO")
     private Endereco endereco;
 }

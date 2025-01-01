@@ -17,7 +17,7 @@ public class PessoaController {
 
     // create
     @PostMapping
-    public ResponseEntity<Long> criarPessoa(@Valid PessoaReq pessoaReq){
+    public ResponseEntity<Long> criarPessoa(@Valid @RequestBody PessoaReq pessoaReq){
         Pessoa pessoa = pessoaManager.criarPessoa(pessoaReq);
         return ResponseEntity.ok(pessoa.getId());
     }
@@ -32,6 +32,9 @@ public class PessoaController {
 //    @PutMapping
 
     // delete
-//    @DeleteMapping
-
+    @DeleteMapping(path={"{id}"})
+    public ResponseEntity<Long> deletarPessoa(@PathVariable Long id) throws Exception {
+        pessoaManager.deletarPessoa(id);
+        return ResponseEntity.ok().build();
+    }
 }
