@@ -4,12 +4,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public interface GenericMapper<E, D> {
-    D toReq(E entity);
+    D toRequest(E entity);
 
     E toEntity(D req);
 
-    default List<D> toReqList(List<E> entities) {
-        return entities.stream().map(this::toReq).collect(Collectors.toList());
+    default List<D> toRequestList(List<E> entities) {
+        return entities.stream().map(this::toRequest).collect(Collectors.toList());
     }
 
     default List<E> toEntityList(List<D> reqs) {

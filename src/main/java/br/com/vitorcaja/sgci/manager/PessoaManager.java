@@ -3,7 +3,6 @@ package br.com.vitorcaja.sgci.manager;
 import br.com.vitorcaja.sgci.controller.schema.PessoaRequest;
 import br.com.vitorcaja.sgci.controller.schema.PessoaResponse;
 import br.com.vitorcaja.sgci.mapper.PessoaMapper;
-import br.com.vitorcaja.sgci.model.Pessoa;
 import br.com.vitorcaja.sgci.repository.PessoaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -24,6 +23,20 @@ public class PessoaManager {
     @Autowired
     private PessoaMapper pessoaMapper;
 
+    public PessoaResponse recuperarPessoa(Long id){
+        var pessoa =
+                pessoaRepository
+                        .findById(id)
+                        .orElseThrow(()->
+                                new ResponseStatusException(
+                                        HttpStatus.NOT_FOUND,
+                                        String.format(
+                                                "Falha ao recuperar pessoa. Pessoa com identificador %s não localizado.",
+                                                id)));
+
+        return pessoaMapper.toResponse(pessoa);
+    }
+
     public List<PessoaResponse> recuperarTodasPessoas(){
         return recuperarTodasPessoasOrdenadas(Sort.Direction.ASC, "nome");
     }
@@ -34,7 +47,7 @@ public class PessoaManager {
     }
 
     @Transactional
-    public Pessoa criarPessoa(PessoaRequest pessoaRequest){
+    public PessoaResponse criarPessoa(PessoaRequest pessoaRequest){
 
         // validacoes
         if(pessoaRequest.endereco()==null){
@@ -48,7 +61,49 @@ public class PessoaManager {
 
         // criar uma pessoa de salvar no banco de dados
         var pessoa = pessoaMapper.toEntity(pessoaRequest);
-        return pessoaRepository.save(pessoa);
+        pessoa = pessoaRepository.save(pessoa);
+
+        return pessoaMapper.toResponse(pessoa);
+    }
+
+    @Transactional
+    public PessoaResponse atualizarPessoa(PessoaRequest pessoaRequest){
+
+        // validacoes
+        if(pessoaRequest.id()==null || pessoaRequest.id().equals(0L)){
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    String.format(
+                            "Falha ao atualizar a pessoa %s. Pessoa com identificador %s não localizado",
+                            pessoaRequest.nome(),
+                            pessoaRequest.toString()));
+        }
+
+        if(pessoaRequest.endereco()==null){
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    String.format(
+                            "Falha ao atualizar a pessoa %s. O endereço está vazio. %s",
+                            pessoaRequest.nome(),
+                            pessoaRequest.toString()));
+        }
+
+        var pessoaBD =
+                pessoaRepository
+                        .findById(pessoaRequest.id())
+                        .orElseThrow(()->
+                                new ResponseStatusException(
+                                        HttpStatus.NOT_FOUND,
+                                        String.format(
+                                                "Falha ao atualizar pessoa. Pessoa com identificador %s não localizado.",
+                                                pessoaRequest.id())));
+
+        var pessoa = pessoaMapper.toEntity(pessoaRequest);
+        pessoa.getEndereco().setId(pessoaBD.getId());
+
+        pessoa = pessoaRepository.save(pessoa);
+
+        return pessoaMapper.toResponse(pessoa);
     }
 
     @Transactional
@@ -60,7 +115,7 @@ public class PessoaManager {
                                 new ResponseStatusException(
                                         HttpStatus.NOT_FOUND,
                                         String.format(
-                                                "Falha ao deletar pessoa. Registro com id %s não localizado.",
+                                                "Falha ao deletar pessoa. Pessoa com identificador %s não localizado.",
                                                 id)));
 
         pessoaRepository.delete(pessoa);

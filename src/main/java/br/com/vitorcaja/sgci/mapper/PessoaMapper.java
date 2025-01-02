@@ -15,7 +15,7 @@ public class PessoaMapper  implements GenericMapper<Pessoa, PessoaRequest>{
     private EnderecoMapper enderecoMapper;
 
     @Override
-    public PessoaRequest toReq(Pessoa entity) {
+    public PessoaRequest toRequest(Pessoa entity) {
         if (entity == null) {
             return null;
         }
@@ -29,7 +29,7 @@ public class PessoaMapper  implements GenericMapper<Pessoa, PessoaRequest>{
                         .documento(entity.getDocumento())
                         .profissao(entity.getProfissao())
                         .estadoCivil(entity.getEstadoCivil())
-                        .endereco(enderecoMapper.toReq(entity.getEndereco()))
+                        .endereco(enderecoMapper.toRequest(entity.getEndereco()))
                         .build();
     }
 

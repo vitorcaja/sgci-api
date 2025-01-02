@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 @Component
 public class EnderecoMapper implements GenericMapper<Endereco, EnderecoRequest>{
     @Override
-    public EnderecoRequest toReq(Endereco entity) {
+    public EnderecoRequest toRequest(Endereco entity) {
         if (entity == null) {
             return null;
         }

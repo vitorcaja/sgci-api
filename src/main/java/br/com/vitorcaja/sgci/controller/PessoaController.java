@@ -5,6 +5,8 @@ import br.com.vitorcaja.sgci.controller.schema.PessoaResponse;
 import br.com.vitorcaja.sgci.manager.PessoaManager;
 import br.com.vitorcaja.sgci.model.Pessoa;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +23,8 @@ public class PessoaController {
     // create
     @PostMapping
     public ResponseEntity<Long> criarPessoa(@Valid @RequestBody PessoaRequest pessoaRequest){
-        Pessoa pessoa = pessoaManager.criarPessoa(pessoaRequest);
-        return ResponseEntity.ok(pessoa.getId());
+        PessoaResponse pessoa = pessoaManager.criarPessoa(pessoaRequest);
+        return ResponseEntity.ok(pessoa.id());
     }
 
     // read
@@ -32,8 +34,18 @@ public class PessoaController {
         return ResponseEntity.ok(pessoas);
     }
 
+    @GetMapping(path={"{id}"})
+    public ResponseEntity<PessoaResponse> recuperarPessoa(@PathVariable @NotNull Long id){
+        PessoaResponse pessoa = pessoaManager.recuperarPessoa(id);
+        return ResponseEntity.ok(pessoa);
+    }
+
     // update
-//    @PutMapping
+    @PutMapping
+    public ResponseEntity<Long> atualizarPessoa(@Valid @RequestBody PessoaRequest pessoaRequest){
+        PessoaResponse pessoaResponse = pessoaManager.atualizarPessoa(pessoaRequest);
+        return ResponseEntity.ok(pessoaResponse.id());
+    }
 
     // delete
     @DeleteMapping(path={"{id}"})
