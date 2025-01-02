@@ -1,11 +1,13 @@
 package br.com.vitorcaja.sgci.controller.schema;
 
-import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 
-public record EnderecoReq(
+@Builder
+public record EnderecoResponse(
+        Long id,
         String cep,
-        @NotNull String estado,
-        @NotNull String cidade,
+        String estado,
+        String cidade,
         String rua,
         String bairro,
         Integer numero
