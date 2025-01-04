@@ -4,6 +4,7 @@ import br.com.vitorcaja.sgci.controller.schema.PessoaRequest;
 import br.com.vitorcaja.sgci.controller.schema.PessoaResponse;
 import br.com.vitorcaja.sgci.manager.PessoaManager;
 import br.com.vitorcaja.sgci.model.Pessoa;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name="Pessoa::Pessoa")
 @RestController
 @RequestMapping("pessoas")
 public class PessoaController {
