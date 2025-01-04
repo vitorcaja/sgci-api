@@ -1,18 +1,29 @@
 package br.com.vitorcaja.sgci.manager;
 
+import br.com.vitorcaja.sgci.controller.schema.PessoaFilter;
 import br.com.vitorcaja.sgci.controller.schema.PessoaRequest;
 import br.com.vitorcaja.sgci.controller.schema.PessoaResponse;
 import br.com.vitorcaja.sgci.mapper.PessoaMapper;
+import br.com.vitorcaja.sgci.model.Pessoa;
 import br.com.vitorcaja.sgci.repository.PessoaRepository;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.validation.Valid;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Validated
@@ -37,13 +48,74 @@ public class PessoaManager {
         return pessoaMapper.toResponse(pessoa);
     }
 
-    public List<PessoaResponse> recuperarTodasPessoas(){
-        return recuperarTodasPessoasOrdenadas(Sort.Direction.ASC, "nome");
-    }
+    public List<PessoaResponse> recuperarTodasPessoas(@Valid PessoaFilter pessoaFilter){
+        Specification<Pessoa> filtrosSpecification = (root, query, cb) -> {
+            List<Predicate> condicoes = new ArrayList<>();
 
-    public List<PessoaResponse> recuperarTodasPessoasOrdenadas(Sort.Direction sortDirection, String nomeCampoParaOrdernar){
-        var pessoas =  pessoaRepository.findAll(Sort.by(sortDirection, nomeCampoParaOrdernar));
-        return pessoaMapper.toResponseToList(pessoas);
+            if(Strings.isNotBlank(pessoaFilter.getNome())){
+                condicoes.add(
+                        cb.like(
+                                root.get("nome"),
+                                String.format(
+                                        "%%%s%%",
+                                        pessoaFilter.getNome())));
+            }
+
+            if(Strings.isNotBlank(pessoaFilter.getDocumento())){
+                condicoes.add(
+                        cb.equal(
+                                root.get("documento"),
+                                pessoaFilter.getDocumento()));
+            }
+
+            if(pessoaFilter.getTipo()!=null){
+                condicoes.add(
+                        cb.equal(
+                                root.get("tipo"),
+                                pessoaFilter.getTipo()));
+            }
+
+            if(Strings.isNotBlank(pessoaFilter.getCep())){
+                condicoes.add(
+                        cb.equal(
+                                root.get("endereco").get("cep"),
+                                pessoaFilter.getCep()));
+            }
+
+            if(Strings.isNotBlank(pessoaFilter.getEstado())){
+                condicoes.add(
+                        cb.equal(
+                                root.get("endereco").get("estado"),
+                                pessoaFilter.getEstado()));
+            }
+
+            if(Strings.isNotBlank(pessoaFilter.getCidade())){
+                condicoes.add(
+                        cb.equal(
+                                root.get("endereco").get("cidade"),
+                                pessoaFilter.getCidade()));
+            }
+
+            return cb.and(condicoes.toArray(Predicate[]::new));
+        };
+
+        Pageable pageable =
+                PageRequest.of(
+                        pessoaFilter.getPage(),
+                        pessoaFilter.getSize(),
+                        Sort.by(
+                                pessoaFilter.getDirection(),
+                                pessoaFilter.getOrdenarPor()));
+
+        var pessoas = pessoaRepository.findAll(filtrosSpecification, pageable);
+
+        return
+                pessoas
+                        .stream()
+                        .map(pessoa -> {
+                            return pessoaMapper.toResponse(pessoa);
+                        })
+                        .collect(Collectors.toList());
     }
 
     @Transactional

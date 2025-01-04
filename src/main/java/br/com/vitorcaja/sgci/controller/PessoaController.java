@@ -1,5 +1,6 @@
 package br.com.vitorcaja.sgci.controller;
 
+import br.com.vitorcaja.sgci.controller.schema.PessoaFilter;
 import br.com.vitorcaja.sgci.controller.schema.PessoaRequest;
 import br.com.vitorcaja.sgci.controller.schema.PessoaResponse;
 import br.com.vitorcaja.sgci.manager.PessoaManager;
@@ -31,8 +32,8 @@ public class PessoaController {
 
     // read
     @GetMapping
-    public ResponseEntity<List<PessoaResponse>> listarTodasPessoas(){
-        List<PessoaResponse> pessoas = pessoaManager.recuperarTodasPessoas();
+    public ResponseEntity<List<PessoaResponse>> listarTodasPessoas(@Valid PessoaFilter pessoaFilter){
+        List<PessoaResponse> pessoas = pessoaManager.recuperarTodasPessoas(pessoaFilter);
         return ResponseEntity.ok(pessoas);
     }
 
