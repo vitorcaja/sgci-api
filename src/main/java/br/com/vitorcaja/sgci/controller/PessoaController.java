@@ -1,5 +1,6 @@
 package br.com.vitorcaja.sgci.controller;
 
+import br.com.vitorcaja.sgci.controller.schema.PagedResponse;
 import br.com.vitorcaja.sgci.controller.schema.PessoaFilter;
 import br.com.vitorcaja.sgci.controller.schema.PessoaRequest;
 import br.com.vitorcaja.sgci.controller.schema.PessoaResponse;
@@ -32,9 +33,9 @@ public class PessoaController {
 
     // read
     @GetMapping
-    public ResponseEntity<List<PessoaResponse>> listarTodasPessoas(@Valid PessoaFilter pessoaFilter){
-        List<PessoaResponse> pessoas = pessoaManager.recuperarTodasPessoas(pessoaFilter);
-        return ResponseEntity.ok(pessoas);
+    public ResponseEntity<PagedResponse<PessoaResponse>> listarTodasPessoas(@Valid PessoaFilter pessoaFilter){
+        PagedResponse<PessoaResponse> pessoasPaged = pessoaManager.recuperarTodasPessoas(pessoaFilter);
+        return ResponseEntity.ok(pessoasPaged);
     }
 
     @GetMapping(path={"{id}"})

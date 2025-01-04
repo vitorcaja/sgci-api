@@ -1,5 +1,6 @@
 package br.com.vitorcaja.sgci.manager;
 
+import br.com.vitorcaja.sgci.controller.schema.PagedResponse;
 import br.com.vitorcaja.sgci.controller.schema.PessoaFilter;
 import br.com.vitorcaja.sgci.controller.schema.PessoaRequest;
 import br.com.vitorcaja.sgci.controller.schema.PessoaResponse;
@@ -48,7 +49,7 @@ public class PessoaManager {
         return pessoaMapper.toResponse(pessoa);
     }
 
-    public List<PessoaResponse> recuperarTodasPessoas(@Valid PessoaFilter pessoaFilter){
+    public PagedResponse<PessoaResponse> recuperarTodasPessoas(@Valid PessoaFilter pessoaFilter){
         Specification<Pessoa> filtrosSpecification = (root, query, cb) -> {
             List<Predicate> condicoes = new ArrayList<>();
 
@@ -109,13 +110,20 @@ public class PessoaManager {
 
         var pessoas = pessoaRepository.findAll(filtrosSpecification, pageable);
 
-        return
+        var pessoasResponse =
                 pessoas
                         .stream()
                         .map(pessoa -> {
                             return pessoaMapper.toResponse(pessoa);
                         })
                         .collect(Collectors.toList());
+
+        return
+                new PagedResponse<PessoaResponse>(
+                        pessoas.getTotalElements(),
+                        pessoas.getTotalPages(),
+                        pageable.getPageSize(),
+                        pessoasResponse);
     }
 
     @Transactional
