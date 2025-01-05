@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Builder
 @Data
-public class PessoaFilter extends  FilterPageable{
+public class PessoaFilter extends FilterPageable{
     public String nome;
     public TipoPessoaEnum tipo;
     public String documento;
