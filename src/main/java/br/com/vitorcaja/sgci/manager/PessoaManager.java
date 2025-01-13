@@ -134,9 +134,18 @@ public class PessoaManager {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     String.format(
-                            "Falha ao criar a pessoa %s. O endereço está vazio. %s",
+                            "Falha ao criar a pessoa '%s'. O endereço está vazio. %s",
                             pessoaRequest.nome(),
                             pessoaRequest.toString()));
+        }
+
+        if(pessoaRepository.findPessoaByDocumento(pessoaRequest.documento()).isPresent()){
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    String.format(
+                            "Falha ao criar a pessoa '%s'. O documento '%s' já foi cadastrado.",
+                            pessoaRequest.nome(),
+                            pessoaRequest.documento()));
         }
 
         // criar uma pessoa de salvar no banco de dados
